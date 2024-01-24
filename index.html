@@ -1,0 +1,36 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real-time Editor</title>
+</head>
+<body>
+  <textarea id="editor"></textarea>
+  <script>
+    const socket = new WebSocket('ws://localhost:3000');
+
+    // Wait for the WebSocket connection to open
+    socket.addEventListener('open', (event) => {
+      console.log('Connected to the server');
+    });
+
+    // Handle incoming messages (updates to the document)
+    socket.addEventListener('message', (event) => {
+      const updatedContent = JSON.parse(event.data);
+      console.log('Received updated content:', updatedContent);
+      // Update the textarea with the received content
+      document.getElementById('editor').value = updatedContent.content;
+    });
+
+    // For simplicity, you might want to remove the following lines
+    // They are just placeholders as there's no HTML in this example
+    document.getElementById('editor').addEventListener('input', (event) => {
+      // Send WebSocket message when the user types
+      const content = event.target.value;
+      socket.send(JSON.stringify({ type: 'update', content }));
+    });
+  </script>
+</body>
+</html>
